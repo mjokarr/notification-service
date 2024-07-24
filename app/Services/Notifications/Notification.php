@@ -1,52 +1,48 @@
 <?php 
 namespace App\Services\Notifications;
-// require '../../../vendor/autoload.php';
 
+use App\Services\Notifications\providers\Contracts\Provider;
+use Exception;
 use App\Models\User;
-use GuzzleHttp\Client;
-use Kavenegar\KavenegarApi;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Contracts\Mail\Mailable;
-use Kavenegar\Exceptions\ApiException;
-use PhpParser\Node\Stmt\TryCatch;
 
 class Notification 
 {
-    public function sendEmail(User $user, Mailable $mailable)
+
+    /**
+     * @method SmsProvider(\App\Models\User $user, String $message)
+     * @method EmailProvider(\App\Models\User $user, \Illuminate\Mail\Mailable $mailable)
+     */
+    // public function sendEmail(User $user, Mailable $mailable)
+    // {
+    //     $emailProvider = new EmailProvider();
+    //     return $emailProvider->send($user, $mailable);
+    // }
+
+
+    // public function sendSms(User $user, String $message)
+    // {
+    //     $smsProvider = new SmsProvider();
+    //     return $smsProvider->send($user, $message);
+    // }
+
+
+    ##### Instead of the above cods: #####
+    # Dinamically: with validation.
+    public function __call(String $name, Array $arguments)
     {
-        return Mail::to($user)->send($mailable);
+        $providerPath = __NAMESPACE__ . '\providers\\' . substr($name, 4) . 'Provider'; 
+
+        if(!class_exists($providerPath))
+        {
+            throw new Exception('The class name dos not exist!!');
+        }
+
+        $providerInstance = new $providerPath(... $arguments);
+
+        if(!is_subclass_of($providerInstance, Provider::class))
+        {
+            throw new Exception('the class, must be a subclass of App\Services\Notifications\providers\Contracts\Provider');
+        }
+        return $providerInstance->send();
     }
-
-
-    public function sendSms(User $user, String $message)
-    {
-
-        try{
-            $api = new KavenegarApi( config('services.sms.uri') );
-            $sender = "10008663";
-            $message = $message;
-            $receptor = $user->phone_number;
-            $result = $api->Send($sender,$receptor,$message);
-            if($result){
-                foreach($result as $r){
-                    echo "messageid = $r->messageid";
-                    echo "message = $r->message";
-                    echo "status = $r->status";
-                    echo "statustext = $r->statustext";
-                    echo "sender = $r->sender";
-                    echo "receptor = $r->receptor";
-                    echo "date = $r->date";
-                    echo "cost = $r->cost";
-                }		
-            }
-        }
-        catch(\Kavenegar\Exceptions\ApiException $e){
-    
-            echo 'Response is not ok: ' . $e->errorMessage();
-        }
-        catch(\Kavenegar\Exceptions\HttpException $e){
-            echo 'Connection Failed: ' . $e->errorMessage();
-        }
-    }
-    
 }
