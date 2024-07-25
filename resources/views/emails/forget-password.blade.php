@@ -1,7 +1,5 @@
 <x-mail::message>
-# User Registed
- 
-{{ $full_name }}
+# Forget Password
 
 The body of your message.
 
