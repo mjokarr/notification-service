@@ -3,6 +3,7 @@
 namespace App\Services\Notifications\Providers;
 
 use App\Models\User;
+use App\Services\Notifications\Exceptions\UserDoesNotHaveNumber;
 use App\Services\Notifications\providers\Contracts\Provider;
 use Kavenegar\KavenegarApi;
 
@@ -19,6 +20,9 @@ class SmsProvider implements Provider
 
     public function send()
     {
+        # check user have phone number:
+        $this->havePhoneNumber();
+
         try{
             $api = new KavenegarApi( config('services.sms.uri') );
             $sender = "10008663";
@@ -44,6 +48,14 @@ class SmsProvider implements Provider
         }
         catch(\Kavenegar\Exceptions\HttpException $e){
             echo 'Connection Failed: ' . $e->errorMessage();
+        }
+    }
+
+    private function havePhoneNumber()
+    {
+        if(is_null($this->user->phone_number))
+        {
+            throw new UserDoesNotHaveNumber();
         }
     }
 }

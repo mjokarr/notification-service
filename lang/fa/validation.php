@@ -8,6 +8,8 @@ return
         'string' => ':attribute باید کمتر از :max کاراکتر باشد.',
     ],
     'string' => ':attribute باید به صورت صحیح وارد شود.',
+    
+   
     'attributes' =>
     [
         'user' => 'کاربر', 
