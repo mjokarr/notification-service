@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
 use App\Models\User;
+use App\Jobs\SendSms;
+use App\Jobs\SendEmail;
 use Illuminate\Http\Request;
+use Illuminate\Contracts\Mail\Mailable;
 use App\Services\Notifications\Notification;
 use App\Services\Notifications\Constants\EmailTypes;
 use App\Services\Notifications\Exceptions\UserDoesNotHaveNumber;
-use Exception;
 
 class NotificationsController extends Controller
 {
@@ -27,9 +30,13 @@ class NotificationsController extends Controller
 
         try {
 
-            // $mailable = EmailTypes::toMail($request->email_type);
-            $notificationService = resolve(Notification::class);
-            $notificationService->sendEmail(User::find($request->user), new $mailable);
+            
+            # after use queue service, deleted this line. 
+            // $notificationService = resolve(Notification::class);
+            
+            $mailable = EmailTypes::toMail($request->email_type);
+            SendEmail::dispatch(User::find($request->user), new $mailable);
+
             return redirect()->back()->with('success', __('notification.email_sent_successfully'));
 
         } catch (\Throwable $th) {
@@ -46,7 +53,7 @@ class NotificationsController extends Controller
     # notice:
     # if we set Notification servise as seccond method arguman, laravel destinguesh and new that atumatically.
     # that rule's name is <auto wiring>.     
-    public function sendSms(Request $request, Notification $notification)
+    public function sendSms(Request $request)
     {
         $request->validate([
             'user' => 'integer | exists:users,id',
@@ -55,12 +62,9 @@ class NotificationsController extends Controller
         
         try 
         {
-            $notification->sendSms(User::find($request->user), $request->text);
+            SendSms::dispatch(User::find($request->user), $request->text);
             return $this->redirectBack('success', __('notification.sms_sent_successfully')); 
 
-        } catch (UserDoesNotHaveNumber $e)
-        {
-            return $this->redirectBack('failed', __('notification.user_does_not_have_phone_number'));
         }
         catch (Exception $e)
         {
