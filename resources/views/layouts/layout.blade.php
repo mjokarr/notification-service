@@ -39,8 +39,8 @@
                     </a>
                 
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="{{ route('notification.for.email') }}">ارسال ایمیل</a>
-                        <a class="dropdown-item" href="">ارسال پیام کوتاه</a>
+                        <a class="dropdown-item" href="{{ route('notification.for.email') }}">@lang('notification.send_email')</a>
+                        <a class="dropdown-item" href="{{ route('notification.for.sms') }}">@lang('notification.send_sms')</a>
                     </div>
                 </li>
         </div>

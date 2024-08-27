@@ -22,3 +22,5 @@ Route::get('/home', function ()
 });
 Route::get('notification/send-email', [NotificationsController::class, 'email'])->name('notification.for.email');
 Route::post('notification/send-email', [NotificationsController::class, 'sendEmail'])->name('notification.send.email');
+Route::get('notification/send-sms', [NotificationsController::class, 'sms'])->name('notification.for.sms');
+Route::post('notification/send-sms', [NotificationsController::class, 'sendSms'])->name('notification.send.sms');

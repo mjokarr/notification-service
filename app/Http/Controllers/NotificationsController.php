@@ -13,7 +13,7 @@ class NotificationsController extends Controller
     {
         $users = User::all();
         $emailTypes = EmailTypes::toString();
-        return view('notification.send-email', compact('users', 'emailTypes'));
+        return view('notifications.send-email', compact('users', 'emailTypes'));
     }
 
     public function sendEmail(Request $request)
@@ -34,4 +34,25 @@ class NotificationsController extends Controller
             return redirect()->back()->with('failed', __('notification.email_has_problem'));
         }
     }
+
+    public function sms()
+    {
+        $users = User::all();
+        return view('notifications.send-sms', compact('users'));
+    }
+
+    # notice:
+    # if we set Notification servise as seccond method arguman, laravel destinguesh and new that atumatically.
+    # that rule's name is <auto wiring>.     
+    public function sendSms(Request $request, Notification $notification)
+    {
+        $request->validate([
+            'user' => 'integer | exists:users,id',
+            'text' => 'string | max:256',
+        ]);
+        
+        $notification->sendSms(User::find($request->user), $request->text);
+        return redirect()->back()->with('success', __('notification.sms_sent_successfully'));
+    }
+
 }
