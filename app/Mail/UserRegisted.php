@@ -3,16 +3,15 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
-use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Mail\Mailables\Envelope;
 
 class UserRegisted extends Mailable
 {
     use Queueable, SerializesModels;
-
+    
     /**
      * Create a new message instance.
      */
@@ -46,7 +45,7 @@ class UserRegisted extends Mailable
             with: [
             'full_name' => $this->firstName . ' ' . $this->lastName,
             ] 
-        );
+p        );
     }
 
     /**
